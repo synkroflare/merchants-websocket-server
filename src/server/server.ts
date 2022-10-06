@@ -20,40 +20,19 @@ const port = 8082
 const ws =  require('ws');
 const wss = new ws.Server({port: port});
 
-wss.use(express())
-wss.use(json())
-wss.use(cors())
-wss.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*');  
-
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,Accept');
-
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  // Pass to next layer of middleware
-  next();
-});
-
-wss.use(router)
 
 wss.broadcast = function(data) {
   wss.clients.forEach(client => client.send(data));
 };
 
+httpServer.listen(port , '0.0.0.0', ()  =>  {
+  console.log('http online on port '+port)    
+})  
 
-
-wss.get('/hcheck' , (req,res)=>{
+app.get('/hcheck' , (req,res)=>{
   console.log('health checked')
   res.sendStatus(200)
 })
-
 
 
 wss.on("connection", wss => {
