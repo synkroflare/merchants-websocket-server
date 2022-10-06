@@ -18,6 +18,12 @@ wss.broadcast = function(data) {
   wss.clients.forEach(client => client.send(data));
 };
 
+app.get('/hcheck' , (req,res)=>{
+  console.log('health checked')
+  res.sendStatus(200)
+})
+
+
 wss.on("connection", wss => {
   console.log('user connected')
 
