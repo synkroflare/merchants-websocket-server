@@ -4,12 +4,14 @@ import '../shared/container'
 import { app } from '../shared/infra/http/httpServer'
 
 const fs = require('fs');
+const http = require('http');
 const privateKey  = fs.readFileSync('key.pem');
 const certificate = fs.readFileSync('cert.pem');
 
 const credentials = {key: privateKey, cert: certificate};
+const httpServer = http.createServer(app);
 
-const port = 8082
+const port = 8082 
 
 const ws =  require('ws');
 const wss = new ws.Server({port: port});
@@ -22,6 +24,7 @@ app.get('/hcheck' , (req,res)=>{
   console.log('health checked')
   res.sendStatus(200)
 })
+
 
 
 wss.on("connection", wss => {
