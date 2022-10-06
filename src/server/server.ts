@@ -17,17 +17,19 @@ const httpServer = http.createServer(app);
 
 const port = 8082 
 
+httpServer.listen(port , '0.0.0.0', ()  =>  {
+  console.log('http online on port '+port)    
+})  
+
 const ws =  require('ws');
-const wss = new ws.Server({port: port});
+const wss = new ws.Server({server: httpServer});
 
 
 wss.broadcast = function(data) {
   wss.clients.forEach(client => client.send(data));
 };
 
-httpServer.listen(port , '0.0.0.0', ()  =>  {
-  console.log('http online on port '+port)    
-})  
+
 
 app.get('/hcheck' , (req,res)=>{
   console.log('health checked')
