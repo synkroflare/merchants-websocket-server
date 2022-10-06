@@ -3,6 +3,10 @@ import 'reflect-metadata'
 import '../shared/container'
 import { app } from '../shared/infra/http/httpServer'
 
+import cors from 'cors'
+import express, { json } from 'express'
+import { router } from '../shared/infra/routes'
+
 const fs = require('fs');
 const http = require('http');
 const privateKey  = fs.readFileSync('key.pem');
@@ -16,11 +20,36 @@ const port = 8082
 const ws =  require('ws');
 const wss = new ws.Server({port: port});
 
+wss.use(express())
+wss.use(json())
+wss.use(cors())
+wss.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', '*');  
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,Accept');
+
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Pass to next layer of middleware
+  next();
+});
+
+wss.use(router)
+
 wss.broadcast = function(data) {
   wss.clients.forEach(client => client.send(data));
 };
 
-app.get('/hcheck' , (req,res)=>{
+
+
+wss.get('/hcheck' , (req,res)=>{
   console.log('health checked')
   res.sendStatus(200)
 })
